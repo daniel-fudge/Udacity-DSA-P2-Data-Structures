@@ -411,8 +411,6 @@ if __name__ == '__main__':
         print(f"Error test {test}: set method didn't have a constant time complexity.")
         n_errors += 1
 
-
-
     print("\n*******************")
     if n_errors > 0:
         raise RuntimeError(f"BOO HOO, {n_errors} errors detected.")
