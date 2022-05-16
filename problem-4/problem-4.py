@@ -14,11 +14,12 @@ Notes:
     1. This code was tested with Python 3.10 and uses __future__ annotations for hinting within the Group class.
 
 Assumptions:
+    1. Duplicate user and group names are acceptable.
 
 """
 
 from __future__ import annotations
-
+from time import time
 
 class Queue(object):
     """Simple search queue based on a list.
@@ -226,6 +227,68 @@ def user_tests():
         print(f"Test {test} passed.")
     else:
         print(f"Error test {test}: expected an AttributeError exception.")
+        n_errors += 1
+
+    # Test invalid arguments
+    print("\nUser test set 2 - Repeated group and user names.")
+    test = 0
+    top = Group('Atreides')
+    top.add_user('Leto')
+    parent = top
+    for _ in range(10):
+        child = Group('Atreides')
+        child.add_user("Paul")
+        parent.add_group(child)
+        parent = child
+    test += 1
+    if is_user_in_group(user='Leto', group=top):
+        print(f"Test {test} passed.")
+    else:
+        print(f"Error test {test}: 'Leto' not in top group.")
+        n_errors += 1
+
+    test += 1
+    if not is_user_in_group(user='Leto', group=parent):
+        print(f"Test {test} passed.")
+    else:
+        print(f"Error test {test}: 'Leto' should be in the lower groups.")
+        n_errors += 1
+
+    # Test an empty group
+    print("\nUser test set 3 - Check a group structure with no users.")
+    test = 0
+    top = Group('Atreides')
+    parent = top
+    for _ in range(10):
+        child = Group('Atreides')
+        parent.add_group(child)
+        parent = child
+    test += 1
+    if not is_user_in_group(user='Leto', group=top):
+        print(f"Test {test} passed.")
+    else:
+        print(f"Error test {test}: group should be empty.")
+        n_errors += 1
+
+    # Test a structure with 1000 groups and users
+    print("\nUser test set 4 - Large structure with a million groups, with one user per group.")
+    test = 0
+    top = Group('g0')
+    parent = top
+    n = 1000000
+    start_time = time()
+    for g in range(1, n+1):
+        child = Group(f'g{g}')
+        child.add_user(f'u{g}')
+        parent.add_group(child)
+        parent = child
+    print(f"{time() - start_time:.2f} seconds to create the group.")
+    test += 1
+    start_time = time()
+    if is_user_in_group(user=f'u{n}', group=top):
+        print(f"Test {test} passed; {time()-start_time:.2f} seconds to find the last user.")
+    else:
+        print(f"Error test {test}: couldn't find user u{n}.")
         n_errors += 1
 
     print("\n*******************")
