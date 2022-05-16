@@ -14,7 +14,22 @@ import sys
 
 
 class Node(object):
+    """The Node Class used in the Huffman Binary Tree.
+
+    Attributes:
+        key (str): The encoded character only used on the leaf nodes.
+        value (int): The frequency of the leaf nodes or the sum of the children values on intermediate nodes.
+        left (Node): The left child node on the binary tree.
+        right (Node): The right child node on the binary tree.
+    """
+
     def __init__(self, value=None, key=None):
+        """The object initialization method.
+
+        Args:
+            key (str): The encoded character only used on the leaf nodes.
+            value (int): The frequency of the leaf nodes or the sum of the children values on intermediate nodes.
+        """
         self.key = key
         self.value = value
         self.left = None
@@ -22,7 +37,15 @@ class Node(object):
 
 
 class BinaryTree(object):
+    """The Binary Class used as the Huffman Binary Tree.
+
+    Attributes:
+        root (Node | None): The root node of the tree.
+        map (dict): The mapping between each character and the associated encoded value.
+    """
+
     def __init__(self):
+        """The object initialization method."""
         self.root = None
         self.map = {}
 
@@ -33,6 +56,12 @@ class BinaryTree(object):
         self.root = node
 
     def make_map(self, node: Node, code: str):
+        """Makes the map between the character at the leaf node and the path to reach the leaf (code).
+
+        Args:
+            node (Node): The node to check for leaf or recurse.
+            code (str): The string representing the path to get to this node (left = 0, right = 1).
+        """
 
         if node is None:
             return
@@ -51,10 +80,17 @@ class BinaryTree(object):
 
 
 class MinHeap(object):
+    """The Min-Heap Class used as a priority queue.
+
+    Attributes:
+        array (list): The array of nodes in the queue.
+        array_size (int): The length od the array.
+    """
+
     def __init__(self):
+        """The object initialization method."""
         self.array = []
         self.array_size = 0
-        self.map = {}
 
     def extract_root(self) -> Node:
         value = self.array.pop(0)
@@ -65,14 +101,14 @@ class MinHeap(object):
     def insert(self, node: Node):
         self.array.append(node)
         self.array_size += 1
-        self.heapify_up(node_number=self.array_size-1)
+        self.heapify_up(node_number=self.array_size - 1)
 
     def get_root(self) -> Node:
         return self.array[0]
 
     @staticmethod
     def get_parent_index(node_number: int) -> int:
-        return (node_number - 1)//2
+        return (node_number - 1) // 2
 
     @staticmethod
     def get_left_child_index(node_number: int) -> int:
@@ -83,6 +119,11 @@ class MinHeap(object):
         return node_number * 2 + 2
 
     def heapify_up(self, node_number: int):
+        """Move up the heap recursively and switch nodes if the parent is larger than the child.
+
+        Args:
+            node_number (int): The index of the node we are investigating.
+        """
         # Stop if at the root (i=0)
         if node_number > 0:
             parent_index = self.get_parent_index(node_number)
@@ -96,6 +137,11 @@ class MinHeap(object):
                 self.heapify_up(parent_index)
 
     def heapify_down(self, node_number: int):
+        """Move down the heap recursively and switch nodes if the parent is larger than the child.
+
+        Args:
+            node_number (int): The index of the node we are investigating.
+        """
 
         # Check left first, return if no child exist
         left_child_index = self.get_left_child_index(node_number)
@@ -124,6 +170,14 @@ class MinHeap(object):
 
 
 def make_huffman_tree(frequency: dict) -> BinaryTree:
+    """Generates the Huffman Binary Tree from the given frequencies.
+
+    Args:
+        frequency (dict): A key for each character with the frequency as a value.
+
+    Returns:
+        BinaryTree: The desired Huffman Binary Tree.
+    """
     huffman_tree = BinaryTree()
 
     # The priority queue is a Min-Heap
@@ -182,7 +236,14 @@ def huffman_encoding(data: str) -> tuple[str, BinaryTree]:
     Returns:
         str: The encoded data.
         BinaryTree: The Huffman binary tree.
+
+    Raises:
+        AttributeError: If the data is not a string.
     """
+
+    # Check the argument
+    if not isinstance(data, str):
+        raise AttributeError(f"Data must be a string but {type(data)} was given.")
 
     # Return empty objects if the string is empty
     if len(data) == 0:
@@ -216,15 +277,63 @@ def huffman_decoding(data: str, tree: BinaryTree) -> str:
     """Decodes the encoded Huffman data with the associated Tree.
 
     Args:
-        data (str): The string to encode.
+        data (str): The string to decode.
         tree (BinaryTree): The Huffman binary tree.
 
     Returns:
         str: The decoded data.
-    """
-    decoded_data = ''
 
+    Raises:
+        AttributeError: If the data is not a string of tree not a BinaryTree.
+    """
+
+    # Check the argument
+    if not isinstance(data, str):
+        raise AttributeError(f"'data' must be a string but {type(data)} was given.")
+    if not isinstance(tree, BinaryTree):
+        raise AttributeError(f"'tree' must be a BinaryTree but {type(data)} was given.")
+
+    # Catch the degenerate case when there is only one character
+    root = tree.get_root()
+    if len(data) == 0:
+        return root.key
+
+    decoded_data = ''
+    while len(data) > 0:
+        character, data = find_character(node=root, data=data, level=0)
+        decoded_data += character
     return decoded_data
+
+
+def find_character(node: Node, data: str, level: int) -> tuple[str, str]:
+    """Finds the character at the leaf node indicated by the prefix of the code data.
+
+    Args:
+        node (Node): The node of the Huffman Binary Tree currently being investigated.
+        data (str): The encoded data that we are following, note after a character is located the used data is removed.
+        level (int): How much of the data are we currently reading, used to removed used data.
+
+    Returns:
+        str: The leaf node key, which is the desired character.
+        str: The encoded data with the used digits at the start of the data removed.
+    """
+
+    # Catch degenerate case
+    if node is None:
+        return "", ""
+
+    # Return character if at leaf and remove the used digits from the data
+    if node.key is not None:
+        return node.key, data[level:]
+
+    # Recurse until leaf found
+    if level >= len(data):
+        raise AttributeError(f"Can't find {data} in the Huffman Binary Tree.")
+
+    if data[level] == '0':
+        return find_character(node=node.left, data=data, level=level + 1)
+    else:
+        return find_character(node=node.right, data=data, level=level + 1)
 
 
 def given_tests():
@@ -247,6 +356,7 @@ def given_tests():
     print("The content of the encoded data is: {}\n".format(decoded_data))
 
 
+# noinspection PyBroadException
 def user_tests():
     """Runs the user tests."""
 
@@ -289,6 +399,81 @@ def user_tests():
             print(f"Error test {test}: expected {expected} but got {actual}.")
             n_errors += 1
 
+    # Test the decoding
+    print("\nUser test set 3 - Decoding")
+    test = 0
+    for expected in ["r", "ab", "ba"]:
+        test += 1
+        encoded_data, tree = huffman_encoding(expected)
+        actual = huffman_decoding(encoded_data, tree)
+        if actual == expected:
+            print(f"Test {test} passed.")
+        else:
+            print(f"Error test {test}: expected {expected} but got {actual}.")
+            n_errors += 1
+
+    # Test invalid encoding arguments
+    print("\nUser test set 4 - Invalid encoding arguments")
+    test = 0
+    for arg in [1, [], {}, None]:
+        test += 1
+        try:
+            # noinspection PyTypeChecker
+            huffman_encoding(arg)
+        except AttributeError:
+            print(f"Test {test} passed.")
+        else:
+            print(f"Error test {test}: expected an AttributeError exception.")
+            n_errors += 1
+
+    # Test invalid decoding arguments
+    print("\nUser test set 5 - Invalid decoding and encoding arguments")
+    test = 0
+    string1 = "abbccc"
+    data1, tree1 = huffman_encoding(string1)
+    for arg in [1, [], {}, None]:
+        test += 1
+        try:
+            # noinspection PyTypeChecker
+            huffman_decoding(arg, tree1)
+        except AttributeError:
+            print(f"Test {test} passed.")
+        else:
+            print(f"Error test {test}: expected an AttributeError exception.")
+            n_errors += 1
+
+        test += 1
+        try:
+            # noinspection PyTypeChecker
+            huffman_decoding(data1, arg)
+        except AttributeError:
+            print(f"Test {test} passed.")
+        else:
+            print(f"Error test {test}: expected an AttributeError exception.")
+            n_errors += 1
+
+    # Test mismatched tree
+    print("\nUser test set 6 - Mismatched tree and data.")
+    test = 1
+    string2 = "wxxyyyzzzz"
+    data2, tree2 = huffman_encoding(string2)
+    try:
+        decoded = huffman_decoding(data1, tree2)
+    except:
+        print(f"Error test {test}: Wasn't expecting an exception.")
+        n_errors += 1
+    else:
+        print(f"Test {test} passed with silly results; {decoded}.")
+
+    test += 1
+    try:
+        decoded = huffman_decoding(data2, tree1)
+    except:
+        print(f"Error test {test}: Wasn't expecting an exception.")
+        n_errors += 1
+    else:
+        print(f"Test {test} passed with silly results; {decoded}.")
+
     print("\n*******************")
     if n_errors > 0:
         raise RuntimeError(f"BOO HOO, {n_errors} errors detected.\n")
@@ -298,5 +483,5 @@ def user_tests():
 
 # **********************************************************
 if __name__ == '__main__':
-    user_tests()
     given_tests()
+    user_tests()
