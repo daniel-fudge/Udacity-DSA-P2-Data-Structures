@@ -5,6 +5,7 @@
 Notes:
     1. This code could have been simplified by using the builtin Python set Type and the union and intersection
         operations. They weren't used to illustrate the basic functionality.
+    2. The resulting order of the list will be based on the first list and then the second.
 
 Assumptions:
     1. Duplicates in the input lists are ignored, therefore no duplicates in the union and intersection output.
@@ -12,8 +13,8 @@ Assumptions:
 """
 
 from __future__ import annotations
-from datetime import datetime
-import hashlib
+
+import random
 from time import time
 
 
@@ -160,9 +161,170 @@ def user_tests():
     # Set some testing constants
     n_errors = 0
 
-    # Check the BlockChain print functionality
-    print("\nUser test set 1 - print functionality.")
+    # Test invalid arguments
+    print("\nUser test set 1 - Invalid arguments.")
+    test = 0
+    linked_list1 = LinkedList()
+    elements1 = [2, "s", "3"]
+    for v in elements1:
+        linked_list1.append(v)
+
+    # Verify the baseline test works
+    test += 1
+    actual = union(list1=linked_list1, list2=linked_list1)
+    expected = set(elements1).union(elements1)
+    errors = expected.symmetric_difference(actual.get_unique_values())
+    if len(errors) == 0:
+        print(f"Test {test} baseline union correct, expected and actual values are the same.")
+    else:
+        print(f"Error test {test}: errors = {errors}.")
+        n_errors += 1
+
+    test += 1
+    actual = intersection(list1=linked_list1, list2=linked_list1)
+    expected = set(elements1).intersection(elements1)
+    errors = expected.symmetric_difference(actual.get_unique_values())
+    if len(errors) == 0:
+        print(f"Test {test} baseline intersection correct, expected and actual values are the same.")
+    else:
+        print(f"Error test {test}: errors = {errors}.")
+        n_errors += 1
+
+    # Try a bunch of bad arguments
+    for arg in [1, [], {}, None]:
+        test += 1
+        try:
+            # noinspection PyTypeChecker
+            union(list1=linked_list1, list2=arg)
+        except AttributeError:
+            print(f"Test {test} passed.")
+        else:
+            print(f"Error test {test}: expected an AttributeError exception.")
+            n_errors += 1
+
+        test += 1
+        try:
+            # noinspection PyTypeChecker
+            union(list1=arg, list2=linked_list1)
+        except AttributeError:
+            print(f"Test {test} passed.")
+        else:
+            print(f"Error test {test}: expected an AttributeError exception.")
+            n_errors += 1
+
+        test += 1
+        try:
+            # noinspection PyTypeChecker
+            intersection(list1=linked_list1, list2=arg)
+        except AttributeError:
+            print(f"Test {test} passed.")
+        else:
+            print(f"Error test {test}: expected an AttributeError exception.")
+            n_errors += 1
+
+        test += 1
+        try:
+            # noinspection PyTypeChecker
+            intersection(list1=arg, list2=linked_list1)
+        except AttributeError:
+            print(f"Test {test} passed.")
+        else:
+            print(f"Error test {test}: expected an AttributeError exception.")
+            n_errors += 1
+
+    # Test empty list
+    print("\nUser test set 2 - Empty linked lists.")
+    empty_list = LinkedList()
+
     test = 1
+    actual = union(list1=linked_list1, list2=empty_list)
+    errors = set(elements1).symmetric_difference(actual.get_unique_values())
+    if len(errors) == 0:
+        print(f"Test {test} passed.")
+    else:
+        print(f"Error test {test}: expected {elements1} empty union but got {errors}.")
+        n_errors += 1
+
+    test += 1
+    actual = union(list1=empty_list, list2=linked_list1)
+    errors = set(elements1).symmetric_difference(actual.get_unique_values())
+    if len(errors) == 0:
+        print(f"Test {test} passed.")
+    else:
+        print(f"Error test {test}: expected {elements1} empty union but got {errors}.")
+        n_errors += 1
+
+    test += 1
+    actual = union(list1=empty_list, list2=empty_list)
+    if len(actual) == 0:
+        print(f"Test {test} passed.")
+    else:
+        print(f"Error test {test}: expected empty union but got {actual}.")
+        n_errors += 1
+
+    test += 1
+    actual = intersection(list1=linked_list1, list2=empty_list)
+    if len(actual) == 0:
+        print(f"Test {test} passed.")
+    else:
+        print(f"Error test {test}: expected empty union but got {actual}.")
+        n_errors += 1
+
+    test += 1
+    actual = intersection(list1=empty_list, list2=linked_list1)
+    if len(actual) == 0:
+        print(f"Test {test} passed.")
+    else:
+        print(f"Error test {test}: expected empty union but got {actual}.")
+        n_errors += 1
+
+    test += 1
+    actual = intersection(list1=empty_list, list2=empty_list)
+    if len(actual) == 0:
+        print(f"Test {test} passed.")
+    else:
+        print(f"Error test {test}: expected empty union but got {actual}.")
+        n_errors += 1
+
+    # Test large list
+    print("\nUser test set 3 - Two 10,000 node list randomly sampled from [0, 100,000].")
+    n = 10000
+    elements1 = [random.randint(0, 10*n) for _ in range(n)]
+    elements2 = [random.randint(0, 10*n) for _ in range(n)]
+
+    print(f"\tBuilding the two {n} node lists.")
+    start_time = time()
+    linked_list1 = LinkedList()
+    for v in elements1:
+        linked_list1.append(v)
+    linked_list2 = LinkedList()
+    for v in elements2:
+        linked_list2.append(v)
+    print(f"\tBuilding took {time() - start_time:.2f} seconds.")
+
+    print(f"\tCreating the union.")
+    test += 1
+    start_time = time()
+    actual = union(list1=linked_list1, list2=linked_list2)
+    print(f"\tUnion took {time() - start_time:.2f} seconds.")
+    expected = set(elements1).union(elements2)
+    errors = expected.symmetric_difference(actual.get_unique_values())
+    if len(errors) == 0:
+        print(f"Test {test} union passed, expected and actual values are the same.")
+    else:
+        print(f"Error test {test}: {len(errors)} errors.")
+
+    print(f"\tCreating the intersection.")
+    test += 1
+    start_time = time()
+    actual = intersection(list1=linked_list1, list2=linked_list2)
+    print(f"\tIntersection took {time() - start_time:.2f} seconds.")
+    expected = set(elements1).intersection(elements2)
+    errors = expected.symmetric_difference(actual.get_unique_values())
+    if len(errors) == 0:
+        print(f"Test {test} intersection passed, expected and actual values are the same.")
+    else:
+        print(f"Error test {test}: {len(errors)} errors.")
 
     print("\n*******************")
     if n_errors > 0:
