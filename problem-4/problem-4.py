@@ -21,6 +21,7 @@ Assumptions:
 from __future__ import annotations
 from time import time
 
+
 class Queue(object):
     """Simple search queue based on a list.
 
