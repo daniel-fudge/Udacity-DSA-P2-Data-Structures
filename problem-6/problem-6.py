@@ -2,8 +2,10 @@
 
 """Problem 5 of the Data Structures Project.
 
+
+Notes:
+
 Assumptions:
-1. The data and hash values are strings.
 
 """
 
@@ -14,24 +16,8 @@ from time import time
 
 
 class Block(object):
-    """The individual Block object used to generate a BlockChain.
-
-    Attributes:
-        timestamp (str): The time the block was created.
-        data (str): The string data to save in the block.
-        previous_hash (str): Hash of the data in the previous block of the BlockChain.
-        hash (str): Hash of the data in the current block.
-        next (Block): The next block in the BlockChain.
-    """
 
     def __init__(self, timestamp: str, data: str, previous_hash: str):
-        """The object initialization.
-
-        Args:
-            timestamp (str): The time the block was created.
-            data (str): The string data to save in the block.
-            previous_hash (str): Hash of the data in the previous block of the BlockChain.
-        """
         self.timestamp = timestamp
         self.data = data
         self.previous_hash = previous_hash
@@ -45,14 +31,6 @@ class Block(object):
 
 
 class BlockChain(object):
-    """The Linked List that represents the BlockChain.
-
-    Attributes:
-        head (Block): The first genesis node (Block) of the BlockChain.
-        tail (Block): The last (newest) node (Block) of the BlockChain.
-        size (int): The number of Block of the BlockChain.
-    """
-
     def __init__(self):
         self.head = None
         self.tail = None
