@@ -5,9 +5,10 @@ from time import time
 """Problem 1 of the Data Structures Project.
 
 Assumptions:
-    1. Both the key and value must be integers.
-    2. 'Use' is defined as but 'set' and 'get' access. 'get' only use would require different 'set' logic.
-    3. A capacity less than 2 is not valid, as it would be degenerate.
+    1. Both the key and value of the cache must be integers.
+    2. 'Use' is defined as both 'set' and 'get' access, e.i. both methods place the node at the head of the Cache. 
+    3. The most recently used node is placed at the head of the Doubly Linked List (Cache).
+    4. A capacity less than 2 is not valid, as it would be degenerate.
 """
 
 
