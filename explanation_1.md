@@ -9,7 +9,7 @@ instead of a singly linked list, because the map points directly to a node. To t
 linked list we need to know the previous node as well as the next node. If we only knew the next node, we would again 
 have to in the worst case traverse the full linked list to find the previous node.  
 
-## Assumptions
+### Assumptions
 1. Both the key and value of the cache must be integers.
 2. 'Use' is defined as both 'set' and 'get' access, e.i. both methods place the node at the head of the Cache. 
 3. The most recently used node is placed at the head of the Doubly Linked List (Cache).

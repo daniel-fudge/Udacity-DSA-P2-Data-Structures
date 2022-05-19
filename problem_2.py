@@ -196,7 +196,7 @@ def run_tests():
             n_errors += 1
 
     # User test case 6 - Very large folder structure, 10 deep with 3 sub folders = 3^10
-    print("\nTest set 5 - Very deep")
+    print("\nTest set 6 - Very deep")
     test = 1
     max_depth = 10
     breath = 3
@@ -210,7 +210,7 @@ def run_tests():
     start_time = time()
     actual = find_files(suffix='.c', path=scratch_folder)
     print(f"Executed in {time() - start_time:.3f} seconds.")
-    expected_entries = sum([3 ** i for i in range(max_depth + 1)])
+    expected_entries = sum([breath ** i for i in range(max_depth + 1)])
     if len(actual) == expected_entries:
         print(f"Test {test} passed, now deleting the scratch folder.")
         shutil.rmtree(scratch_folder)
