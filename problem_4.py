@@ -2,9 +2,9 @@
 
 """Problem 4 of the Data Structures Project.
 
-This code searches for a user in a group/user hierarchy and returns True if found and false otherwise.
+This code searches for a user in a group/user hierarchy and returns True if found and False otherwise.
 
-The group/user hierarchy is effectively a tree structure where each group is a node anf the users are the values in each
+The group/user hierarchy is effectively a tree structure where each group is a node and the users are the values in each
 node.  Therefore, this is a tree search task.
 
 I will implement the Breath First Search (BFS) algorithm to perform the search. For the search queue, I'll use a simple
@@ -15,7 +15,6 @@ Notes:
 
 Assumptions:
     1. Duplicate user and group names are acceptable.
-
 """
 
 from __future__ import annotations
