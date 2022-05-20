@@ -54,17 +54,17 @@ class LinkedList:
     def __len__(self):
         return self.size
 
-    def get_unique_values(self) -> list:
+    def get_unique_values(self) -> set:
         """Return the unique values of the linked list.
 
         Returns:
-            list: The unique values in the linked list.
+            set: The unique values in the linked list.
         """
-        values = []
+        values = set()
         node = self.head
         while node:
             if node.value not in values:
-                values.append(node.value)
+                values.add(node.value)
             node = node.next
         return values
 
@@ -287,8 +287,8 @@ def user_tests():
         n_errors += 1
 
     # Test large list
-    print("\nUser test set 3 - Two 10,000 node list randomly sampled from [0, 100,000].")
-    n = 10000
+    print("\nUser test set 3 - Two million node list randomly sampled from [0, 10 million].")
+    n = 10**6
     elements1 = [random.randint(0, 10*n) for _ in range(n)]
     elements2 = [random.randint(0, 10*n) for _ in range(n)]
 
@@ -306,7 +306,8 @@ def user_tests():
     test += 1
     start_time = time()
     actual = union(list1=linked_list1, list2=linked_list2)
-    print(f"\tUnion took {time() - start_time:.2f} seconds.")
+    union_time = time() - start_time
+    print(f"\tUnion took {union_time:.2f} seconds.")
     expected = set(elements1).union(elements2)
     errors = expected.symmetric_difference(actual.get_unique_values())
     if len(errors) == 0:
@@ -318,7 +319,51 @@ def user_tests():
     test += 1
     start_time = time()
     actual = intersection(list1=linked_list1, list2=linked_list2)
-    print(f"\tIntersection took {time() - start_time:.2f} seconds.")
+    intersection_time = time() - start_time
+    print(f"\tIntersection took {intersection_time:.2f} seconds.")
+    expected = set(elements1).intersection(elements2)
+    errors = expected.symmetric_difference(actual.get_unique_values())
+    if len(errors) == 0:
+        print(f"Test {test} intersection passed, expected and actual values are the same.")
+    else:
+        print(f"Error test {test}: {len(errors)} errors.")
+
+    # Test scalability
+    print("\nUser test set 4 - n = 10,000, to compare with previous n = million test.")
+    n = 10000
+    elements1 = [random.randint(0, 10*n) for _ in range(n)]
+    elements2 = [random.randint(0, 10*n) for _ in range(n)]
+
+    print(f"\tBuilding the two {n} node lists.")
+    start_time = time()
+    linked_list1 = LinkedList()
+    for v in elements1:
+        linked_list1.append(v)
+    linked_list2 = LinkedList()
+    for v in elements2:
+        linked_list2.append(v)
+    print(f"\tBuilding took {time() - start_time:.4f} seconds.")
+
+    print(f"\tCreating the union.")
+    test += 1
+    start_time = time()
+    actual = union(list1=linked_list1, list2=linked_list2)
+    union_time2 = time() - start_time
+    print(f"\tUnion took {union_time2:.2f} seconds, 100n took {union_time/union_time2:.1f} times longer.")
+    expected = set(elements1).union(elements2)
+    errors = expected.symmetric_difference(actual.get_unique_values())
+    if len(errors) == 0:
+        print(f"Test {test} union passed, expected and actual values are the same.")
+    else:
+        print(f"Error test {test}: {len(errors)} errors.")
+
+    print(f"\tCreating the intersection.")
+    test += 1
+    start_time = time()
+    actual = intersection(list1=linked_list1, list2=linked_list2)
+    intersection_time2 = time() - start_time
+    r = intersection_time/intersection_time2
+    print(f"\tIntersection took {intersection_time2:.4f} seconds, 100n took {r:.1f} times longer.")
     expected = set(elements1).intersection(elements2)
     errors = expected.symmetric_difference(actual.get_unique_values())
     if len(errors) == 0:
